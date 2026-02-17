@@ -25,22 +25,22 @@ private val CAMPGROUNDS_URL =
     "https://developer.nps.gov/api/v1/campgrounds?api_key=${PARKS_API_KEY}"
 
 class MainActivity : AppCompatActivity() {
+
+    private val campgrounds = mutableListOf<Campground>()
     private lateinit var campgroundsRecyclerView: RecyclerView
     private lateinit var binding: ActivityMainBinding
-
-    // TODO: Create campgrounds list
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
-        val view = binding.root
-        setContentView(view)
+        setContentView(binding.root)
 
         campgroundsRecyclerView = findViewById(R.id.campgrounds)
 
-        // TODO: Set up CampgroundAdapter with campgrounds
-
+        // Set up adapter AFTER recyclerView exists
+        val campgroundAdapter = CampgroundAdapter(this, campgrounds)
+        campgroundsRecyclerView.adapter = campgroundAdapter
 
         campgroundsRecyclerView.layoutManager = LinearLayoutManager(this).also {
             val dividerItemDecoration = DividerItemDecoration(this, it.orientation)
@@ -59,19 +59,21 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onSuccess(statusCode: Int, headers: Headers, json: JSON) {
-                Log.i(TAG, "Successfully fetched campgrounds: $json")
                 try {
-                    // TODO: Create the parsedJSON
+                    val parsedJson = createJson().decodeFromString(
+                        CampgroundResponse.serializer(),
+                        json.jsonObject.toString()
+                    )
 
-                    // TODO: Do something with the returned json (contains campground information)
-
-                    // TODO: Save the campgrounds and reload the screen
-
+                    parsedJson.data?.let { list ->
+                        campgrounds.clear()
+                        campgrounds.addAll(list)
+                        campgroundAdapter.notifyDataSetChanged()
+                    }
                 } catch (e: JSONException) {
                     Log.e(TAG, "Exception: $e")
                 }
             }
-
         })
     }
 }
