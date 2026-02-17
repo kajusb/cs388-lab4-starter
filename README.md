@@ -1,2 +1,7 @@
-# and102-parks-2
-and102-parks-2
+## Video Walkthrough
+
+Here's a walkthrough of implemented user stories:
+
+![Video Walkthrough](media/walkthrough.gif)
+
+GIF created with Android Studio
